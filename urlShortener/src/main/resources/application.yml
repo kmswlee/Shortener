@@ -1,0 +1,24 @@
+server:
+  port: 8085
+string:
+  base62:
+    abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+
+spring:
+  application:
+    name: url-shortener
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:h2:mem:urls
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
