@@ -22,6 +22,5 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-# thymeleaf 새로고침시 style 반영
   thymeleaf:
     cache: false

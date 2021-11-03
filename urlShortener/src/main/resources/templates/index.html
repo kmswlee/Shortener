@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
 <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <meta charset="UTF-8">
     <title>URL Shortener</title>
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div>
-        <p><center>URL Shortener</center></p>
+    <div class="head">
+        <img src="/img/stove.jpeg" />
     </div>
+    <p><center>URL Shortener</center></p>
     <form action="#" th:action="@{/}" method="post"/>
     <center>
         <input type="text" th:name="originUrl">
@@ -16,7 +17,7 @@
     </center>
     </form>
     <br />
-    <div>
+    <div class="result">
         <center>shorten URL : <a th:href="${shortUrl}" th:text="${shortUrl}" /></center>
     </div>
 </th:block>
