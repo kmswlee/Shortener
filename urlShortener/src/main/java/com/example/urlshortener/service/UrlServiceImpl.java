@@ -3,6 +3,7 @@ package com.example.urlshortener.service;
 import com.example.urlshortener.entity.UrlEntity;
 import com.example.urlshortener.jpa.UrlRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ public class UrlServiceImpl implements UrlService{
     public UrlServiceImpl(UrlRepository urlRepository) {
         this.urlRepository = urlRepository;
     }
-
+    /* base62 인코딩 */
+    /* thx for ref : https://pjh3749.tistory.com/232?category=766108 */
     private String base62Encode(int number) {
         char[] table = base62String.toCharArray();
         StringBuilder sb = new StringBuilder();
@@ -39,10 +41,9 @@ public class UrlServiceImpl implements UrlService{
         }
         return (int)(urlRepository.getMaxId()+1);
     }
-
-    private String validHttpHeader(String originUrl) {
-        /* To Do */
-        return null;
+    /* Q : Impl에서 하는게 맞는지, Controller에서 하는게 맞는지. */
+    private static boolean isUrl(String url) {
+        return new UrlValidator().isValid(url);
     }
 
     @Transactional
@@ -50,21 +51,25 @@ public class UrlServiceImpl implements UrlService{
         int hash = findMaxId();
         UrlEntity urlEntity = UrlEntity.builder()
                                 .originUrl(originUrl)
-                                .shortUrl("http://localhost:8085/"+base62Encode(hash))
+                                .shortUrl("http://localhost:8085/" + base62Encode(hash))
                                 .build();
         return urlRepository.save(urlEntity);
     }
 
     @Transactional
     @Override
-    public UrlEntity isShorten(String originUrl){
-        return Optional.ofNullable(urlRepository.findByOriginUrl(originUrl))
-                .orElseGet(()->makeShortUrl(originUrl));
+    public UrlEntity isShorten(String originUrl) throws Exception {
+        if(isUrl(originUrl)) { /* 올바른 URL 형식인지 체크 */
+            /* origin URL이 존재하는지 체크, 존재한다면 기존 shorten URL 리턴, 없다면 생성후 리턴 */
+            return Optional.ofNullable(urlRepository.findByOriginUrl(originUrl))
+                    .orElseGet(()->makeShortUrl(originUrl));
+        }
+        throw new Exception("올바르지 않는 URL 형식입니다. 올바르게 입력해주세요.");
     }
 
     @Override
     public UrlEntity redirect(String shortUrl) {
-        return Optional.ofNullable(urlRepository.findByShortUrl(shortUrl))
+        return Optional.ofNullable(urlRepository.findByShortUrl("http://localhost:8085/"+shortUrl))
                 .orElseThrow(()->new EntityNotFoundException("등록되지 않은 URL 입니다."));
     }
 

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("/")
@@ -29,7 +29,7 @@ public class UrlController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/url")
-    public ResponseEntity<String> Shorten(@RequestBody RequestUrl originUrl) {
+    public ResponseEntity<String> Shorten(@RequestBody RequestUrl originUrl) throws Exception {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UrlDto urlDto = mapper.map(urlService.isShorten(originUrl.getOriginUrl()),UrlDto.class);
@@ -39,12 +39,15 @@ public class UrlController {
 
     @CrossOrigin("*")
     @GetMapping("/{shortUrl}")
-    public ResponseEntity<String> redirect(@PathVariable String shortUrl){
+    public RedirectView redirect(@PathVariable String shortUrl){
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UrlDto urlDto = mapper.map(urlService.redirect(shortUrl),UrlDto.class);
         ResponseUrl responseUrl = mapper.map(urlDto,ResponseUrl.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseUrl.getOriginUrl());
+        /* thx for ref : http://jmlim.github.io/spring/2019/09/30/spring-redirect-to-an-external-url/ */
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl(responseUrl.getOriginUrl());
+        return redirectView;
     }
 
 }
