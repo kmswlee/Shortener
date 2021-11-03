@@ -48,6 +48,7 @@ public class UrlServiceImpl implements UrlService{
 
     @Transactional
     public UrlEntity makeShortUrl(String originUrl){
+        /* unique한 db id로 해쉬코드 생성 */
         int hash = findMaxId();
         UrlEntity urlEntity = UrlEntity.builder()
                                 .originUrl(originUrl)
